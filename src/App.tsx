@@ -25,7 +25,9 @@ import {
   Heart,
   Copy,
   Check,
-  Instagram
+  Instagram,
+  Camera,
+  Maximize2
 } from 'lucide-react';
 import { GOOGLE_SERVICES } from './constants';
 import { GoogleService } from './types';
@@ -37,6 +39,15 @@ const IconMap: Record<string, React.ElementType> = {
   Gamepad2,
   Activity
 };
+
+const GALLERY_IMAGES = [
+  { id: 1, src: 'https://i.ibb.co/Y4NxKw3w/Whats-App-Image-2026-02-21-at-10-35-30-AM.jpg', alt: 'Gallery Image 1', className: 'md:col-span-2 md:row-span-2' },
+  { id: 2, src: 'https://i.ibb.co/20MVN5Cx/Whats-App-Image-2026-02-23-at-11-35-38-AM.jpg', alt: 'Gallery Image 2', className: 'md:col-span-1 md:row-span-1' },
+  { id: 3, src: 'https://i.ibb.co/Zzgd98QX/Whats-App-Image-2026-02-24-at-4-24-28-PM.jpg', alt: 'Gallery Image 3', className: 'md:col-span-1 md:row-span-1' },
+  { id: 4, src: 'https://i.ibb.co/4wnFNCqr/Whats-App-Image-2026-02-27-at-4-55-39-PM.jpg', alt: 'Gallery Image 4', className: 'md:col-span-2 md:row-span-1' },
+  { id: 5, src: 'https://i.ibb.co/1Ytwm2yz/Whats-App-Image-2026-03-03-at-6-20-05-PM.jpg', alt: 'Gallery Image 5', className: 'md:col-span-1 md:row-span-1' },
+  { id: 6, src: 'https://i.ibb.co/Ndtq8ddm/Whats-App-Image-2026-03-13-at-12-06-13-PM.jpg', alt: 'Gallery Image 6', className: 'md:col-span-3 md:row-span-1' },
+];
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -59,6 +70,9 @@ export default function App() {
   // Donation State
   const [copied, setCopied] = useState(false);
   const upiId = 'rohan.karki@ptyes';
+
+  // Gallery State
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(upiId);
@@ -540,6 +554,58 @@ export default function App() {
         </div>
       </section>
 
+      {/* Professional Gallery Section */}
+      <section id="gallery" className="py-24 px-4 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-bold mb-6"
+            >
+              <Camera className="w-4 h-4" />
+              Creator Portfolio
+            </motion.div>
+            <h2 className="text-4xl font-bold mb-4">The Developer Behind The Code</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              A glimpse into the life, aesthetics, and moments that inspire the creation of Rohan Hub.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[250px] md:auto-rows-[300px]">
+            {GALLERY_IMAGES.map((img, idx) => (
+              <motion.div
+                key={img.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className={`relative group overflow-hidden rounded-3xl cursor-pointer ${img.className}`}
+                onClick={() => setSelectedImage(img.src)}
+              >
+                <img 
+                  src={img.src} 
+                  alt={img.alt} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                  <div className="flex justify-between items-end">
+                    <span className="text-white font-medium translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                      {img.alt}
+                    </span>
+                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                      <Maximize2 className="w-5 h-5" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Donation Section */}
       <section className="py-24 px-4 bg-gradient-to-b from-white to-[#F8F9FA]">
         <div className="max-w-4xl mx-auto">
@@ -673,6 +739,36 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setSelectedImage(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <motion.img
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              src={selectedImage}
+              alt="Fullscreen view"
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+              referrerPolicy="no-referrer"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
